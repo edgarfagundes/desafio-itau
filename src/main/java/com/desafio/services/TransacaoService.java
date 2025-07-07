@@ -1,16 +1,15 @@
-package com.desafio_itau.services;
+package com.desafio.services;
 
-import com.desafio_itau.entities.Transacao;
-import com.desafio_itau.repositories.TransacaoRepository;
+import com.desafio.entities.Transacao;
+import com.desafio.repositories.TransacaoRepository;
+import jakarta.transaction.Transactional;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
 
 @Service
 public class TransacaoService {
@@ -27,7 +26,17 @@ public class TransacaoService {
         }
     }
 
-    public List<Double> getEstatisca(){
+    @Transactional
+    public void addTransacao(Transacao transacao) {
+        try {
+            transacaoRepository.save(transacao);
+        }catch (Exception e){
+            e.getCause();
+        }
+
+    }
+
+    public JSONObject getEstatisca(){
         try {
             LocalDateTime agora = LocalDateTime.now();
 
@@ -39,12 +48,12 @@ public class TransacaoService {
                     })
                     .toList();
 
-            List<Double> estaticas = new ArrayList<>();
-            estaticas.add(getCount(transacoes));
-            estaticas.add(getMax(transacoes));
-            estaticas.add(getMed(transacoes));
-            estaticas.add(getMin(transacoes));
-            estaticas.add(getSum(transacoes));
+            JSONObject estaticas = new JSONObject();
+            estaticas.put("count", getCount(transacoes));
+            estaticas.put("sum", getSum(transacoes));
+            estaticas.put("avg", getMed(transacoes));
+            estaticas.put("min", getMin(transacoes));
+            estaticas.put("max", getMax(transacoes));
             return estaticas;
         } catch (Exception e){
             e.getCause();
@@ -86,4 +95,6 @@ public class TransacaoService {
                 .mapToDouble(Transacao::getValor)
                 .sum();
     }
+
+
 }
