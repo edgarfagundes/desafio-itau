@@ -21,10 +21,16 @@ public class TransacaoController {
     @Autowired
     private TransacaoService transacaoService;
 
+    @GetMapping("/transacoes")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Transacao> getTransacoes(){
+            return transacaoService.findAllTransacao();
+    }
+
     @GetMapping("/estatistica")
     @ResponseStatus(HttpStatus.OK)
     public String getEstatistica(){
-            String jsonsFormated = transacaoService.getEstatisca().toString();
+        String jsonsFormated = transacaoService.getEstatisca().toString();
         return jsonsFormated;
     }
 
